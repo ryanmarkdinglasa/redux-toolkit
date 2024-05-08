@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { postAdded } from '.'
-import { selectAllusers } from '..'
+import { selectAllUsers } from '..'
 
 export const AddPostForm = () => {
 
-    const users = useSelector(selectAllusers)
+    const users = useSelector(selectAllUsers)
 
     const dispatch = useDispatch();
     const [title, setTitle] = useState('')

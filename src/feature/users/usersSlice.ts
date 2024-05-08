@@ -15,4 +15,4 @@ export const usersSlice = createSlice({
     }
 })
 
-export const selectAllusers = (state:any) => state.users
+export const selectAllUsers = (state:any) => state.users

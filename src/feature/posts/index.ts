@@ -1,3 +1,5 @@
 export * from './postsSlice'
 export * from './PostsLists'
 export * from './AddPostForm'
+export * from './PostAuthor'
+export * from './TimeAgo'
