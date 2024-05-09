@@ -4,7 +4,7 @@ import { selectAllPosts, PostAuthor, TimeAgo } from ".";
 export const PostsLists = () => {
     const posts = useSelector(selectAllPosts) || []; // Ensure posts is defined
 
-    const orderedPosts = posts.slice().sort((a: { date: string; }, b: { date: string; }) => b.date.localeCompare(a.date)); // Corrected syntax for sorting
+    const orderedPosts = posts.slice().sort((a: { date: string; }, b: { date: string; }) => b.date.localeCompare(a.date));
 
     const renderedPosts = orderedPosts.map((post:any) => (
         <article key={post.id}>
