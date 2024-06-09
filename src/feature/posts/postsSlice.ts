@@ -31,7 +31,7 @@ export const fetchPosts = createAsyncThunk('posts/fetchPosts', async() =>{
     } catch ( error:any) {
         return error.message;
     }
-})
+});
 
 export const postsSlice = createSlice({
     name: 'posts',
@@ -50,7 +50,7 @@ export const postsSlice = createSlice({
                         userId,
                         date: new Date().toISOString(),
                         reactions:{
-                            tumbsUp: 0,
+                            like: 0,
                             wow: 0,
                             heart: 0
                         }
@@ -91,5 +91,4 @@ export const postsSlice = createSlice({
     }
 })
 
-export const selectAllPosts = (state:any) => state.posts.posts
-export const {postAdded, reactionAdded} = postsSlice.actions
+export const { postAdded, reactionAdded } = postsSlice.actions

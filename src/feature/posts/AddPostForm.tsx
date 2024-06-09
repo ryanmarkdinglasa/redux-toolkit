@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { postAdded } from '.'
-import { selectAllUsers } from '..'
+import { AppDispatch, RootState } from '../../store';
 
 export const AddPostForm = () => {
+    const dispatch: AppDispatch = useDispatch();
+    const users = useSelector((state: RootState) => state.users);
 
-    const users = useSelector(selectAllUsers)
-
-    const dispatch = useDispatch();
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
     const [userId, setUserId] = useState(0)
@@ -18,7 +17,7 @@ export const AddPostForm = () => {
 
     const onSavedPostClick = () => {
         if (title && content){
-            dispatch(postAdded(title,content, userId))
+            dispatch(postAdded(title, content, userId))
             setTitle('')
             setContent('')
             setUserId(0)
