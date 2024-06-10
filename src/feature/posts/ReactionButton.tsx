@@ -9,7 +9,7 @@ const reactionEmoji = {
     heart: '🤍'
 };
 
-export const ReactionButton: React.FC<ReactionButtonProps> = ({ post }) => {
+export const ReactionButton: React.FC<ReactionButtonProps> = ({ post }:any) => {
     //const reactions = post.reactions || {}; // Default to an empty object if reactions is undefined
     const dispatch: AppDispatch = useDispatch();
     const reactionButtons = Object.entries(reactionEmoji).map(([name, emoji]) => (

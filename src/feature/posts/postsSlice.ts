@@ -1,94 +1,94 @@
-import { createSlice, nanoid, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { sub } from 'date-fns';
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
+import { Post, PostState } from '../../shared';
+
 const POST_URL = "https://jsonplaceholder.typicode.com/posts";
 
 
-const initialState:any = {
+const initialState:PostState = {
     posts:[],
     status: 'idle', // idle, loading, succeeded, faled
     error: null
 }
 
-/*const initialState = [
-    { 
-        id:'1', 
-        title: 'Shiibal na siikya', 
-        content: 'yeahh', 
-        date: sub(new Date(), {minutes:10}).toISOString(),
-        reactions:{
-            tumbsUp: 0,
-            wow: 0,
-            heart: 0
-        } 
-    }
-]*/
-
-export const fetchPosts = createAsyncThunk('posts/fetchPosts', async() =>{
+export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
     try {
         const response = await axios.get(POST_URL);
-        return [...response.data];
-    } catch ( error:any) {
-        return error.message;
+        return response.data
+        .map((post: any) => ({
+            ...post,
+            id: post.id || uuidv4(), // Ensure each post has a unique id
+        }))
+    } catch (error: any) {
+        throw Error(error.message);
     }
 });
-
-export const postsSlice = createSlice({
+/*
+(async() => {
+    const response = await axios.get(POST_URL);
+    const data = response.data.map((post: any) => ({
+        ...post,
+        id: post.id || nanoid(), // Ensure each post has a unique id
+    }));
+    console.log(data);
+})();*/export const postsSlice = createSlice({
     name: 'posts',
     initialState,
-    reducers:{
+    reducers: {
         postAdded: {
-            reducer(state, action){
-                state.posts.push(action.payload)
+            reducer(state, action: PayloadAction<Post>) {
+                state.posts.push(action.payload);
             },
-            prepare(title:any, content:any, userId:number):any{
+            prepare(title: string, content: string, userId: number) {
                 return {
-                    payload:{
-                        id: nanoid(),
+                    payload: {
+                        id: uuidv4(),
                         title,
                         content,
                         userId,
                         date: new Date().toISOString(),
-                        reactions:{
+                        reactions: {
                             like: 0,
                             wow: 0,
-                            heart: 0
-                        }
-                    }
-                }
+                            heart: 0,
+                        },
+                    },
+                };
+            },
+        },
+        reactionAdded(state, action: PayloadAction<{ postId: string; reaction: string }>) {
+            const { postId, reaction } = action.payload;
+            const existingPost = state.posts.find(post => post.id === postId);
+            if (existingPost) {
+                existingPost.reactions[reaction]++;
             }
         },
-        reactionAdded(state, action){
-            const {postId, reaction} = action.payload
-            const existingPost:any = state.posts.find((post: { id: any; }) => post.id === postId)
-            if (existingPost) existingPost.reactions[reaction]++
-        }
     },
-    extraReducers( builder:any) {
+    extraReducers: (builder) => {
         builder
-            .addCase(fetchPosts.pending, (state: any, _action:any) => {
-                state.status = 'loading'
+            .addCase(fetchPosts.pending, (state) => {
+                state.status = 'loading';
             })
-            .addCase( fetchPosts.fulfilled, (state:any, action: any) => {
-                state.status = 'succeeded'
+            .addCase(fetchPosts.fulfilled, (state, action: PayloadAction<Post[]>) => {
+                state.status = 'succeeded';
                 let min = 1;
-                const loadedPosts:any = action.payload.map( (post: { date: string, reactions:any }):any => {
-                    post.date = sub(new Date(), {minutes: min++}).toISOString(),
+                const loadedPosts = action.payload.map(post => {
+                    post.date = sub(new Date(), { minutes: min++ }).toISOString();
                     post.reactions = {
-                        like:0,
-                        wow:0,
-                        heart:0
-                    }
+                        like: 0,
+                        wow: 0,
+                        heart: 0,
+                    };
                     return post;
                 });
-                // add any fetched posts to the array
-                state.post = state.posts.concat(loadedPosts);
+                state.posts = state.posts.concat(loadedPosts);
             })
-            .addCase(fetchPosts.rejected, (state: any, action: any) => {
-                state.status = 'failed'
-                state.error = action.error.message
-            })
-    }
-})
-
+            .addCase(fetchPosts.rejected, (state:any , action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
+            });
+    },
+});
 export const { postAdded, reactionAdded } = postsSlice.actions
